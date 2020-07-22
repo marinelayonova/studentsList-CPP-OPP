@@ -1,0 +1,298 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <ostream>
+#include<fstream>
+
+using namespace std;
+
+class Grades
+{
+    protected:
+    vector<int>grades;
+public:
+    Grades(vector<int>grades);
+    Grades(const Grades &obj);
+    vector<int> getGrades() const;
+    vector<int> setGrades(vector<int>grades);
+
+};
+
+class Student
+{
+protected:
+    string name;
+    int fakNo;
+    int group;
+    int course;
+    Grades gradess;
+public:
+    Student(string name, int fakNo, int group, int course, vector<int>grades);
+    Student(const Student &obj);
+    string getName() const;
+    int getFakNo() const;
+    int getGroup() const;
+    int getCourse() const;
+    Grades getGradess() const;
+    friend void studentAverageGrades(vector<Student*> &students);
+    friend void groupMaxGrades(vector<Student*> &students);
+    friend void printDataStudent(vector<Student*> &students, int faknomer);
+    friend void printData(Student *students);
+     friend void write_to_file(Student *s,  string const filename);
+    ~Student();
+};
+
+
+Grades::Grades(vector<int>grades)
+{
+    this->grades=grades;
+}
+
+Grades::Grades(const Grades &obj)
+{
+    this->grades=obj.grades;
+}
+
+vector <int> Grades::getGrades() const
+{
+    return this->grades;
+}
+
+vector<int> Grades::setGrades(vector<int>grades)
+{
+    this->grades=grades;
+}
+
+Student::Student(string name, int fakNo, int group, int course, vector<int>grades):gradess(grades)
+{
+    this->name=name;
+    this->fakNo=fakNo;
+    this->group=group;
+    this->course=course;
+}
+
+Student::Student(const Student &obj):gradess(obj.gradess.getGrades())
+{
+    this->name=obj.getName();
+    this->fakNo=obj.getFakNo();
+    this->group=obj.getGroup();
+    this->course=obj.getCourse();
+}
+
+string Student::getName() const
+{
+    return this->name;
+}
+
+int Student::getFakNo() const
+{
+    return this->fakNo;
+}
+
+int Student::getGroup() const
+{
+    return this->group;
+}
+
+int Student::getCourse() const
+{
+    return this->course;
+}
+
+Grades Student::getGradess() const
+{
+    return this->gradess;
+}
+
+Student::~Student()
+{
+    cout<<"destructing"<<endl;
+}
+
+
+
+void studentAverageGrades(vector<Student*> &students)
+{
+    for(int i=0; i<students.size(); i++)
+    {
+        vector<int> stGrades=students[i]->getGradess().getGrades();
+         int sum=0;
+        for(int k=0; k<stGrades.size(); k++)
+        {
+
+            sum+=stGrades[k];
+        }
+        cout<<"Student: "<<students[i]->getName()<<" "<<"has average grade: "<<" "<<(double)sum/stGrades.size()<<endl;
+    }
+}
+
+void groupMaxGrades(vector<Student*> &students)
+{
+    for(int i=0; i<students.size(); i++)
+    {
+
+        vector<int>grGrades=students[i]->getGradess().getGrades();
+           int maximum=grGrades[0];
+        for(int k=0; k<grGrades.size(); k++)
+        {
+
+            if(grGrades[k]>maximum)
+                maximum=grGrades[k];
+        }
+        cout<<students[i]->getName()<<" "<<"has max grade: "<<" "<<maximum<<" "<<" from group: "<<students[i]->getGroup()<<endl;
+    }
+}
+
+void printData(Student *students)
+{
+    vector<int> stGrades= students->getGradess().getGrades();
+    cout<<"Name: "<<students->name<<endl;
+    cout<<"Fak number: "<<students->fakNo<<endl;
+    cout<<"Group: "<<students->group<<endl;
+    cout<<"Course: "<<students->course<<endl;
+    cout<<"Grades: "<<endl;
+
+    for(int k=0;k<stGrades.size();k++){
+            cout<<stGrades[k]<<endl;
+        }
+
+
+   /* for(int k=0; k<ocenki.size(); k++)
+        {
+            cout<<ocenki[k].getOcenki()<<endl;
+        } */
+
+}
+
+void printDataStudent(vector<Student*> &students, int faknomer)
+{
+
+    faknomer=5050;
+
+    for(int i=0; i<students.size(); i++)
+    {
+    if(students[i]->getFakNo()==faknomer)
+    {
+        cout<<"Name: "<<students[i]->getName()<<endl;
+        cout<<"Group: "<<students[i]->getGroup()<<endl;
+        cout<<"Course: "<<students[i]->getCourse()<<endl;
+        cout<<"Faculty nomer: "<<students[i]->getFakNo()<<endl;
+
+    }
+    }
+}
+
+void write_to_file(Student *s,  string const filename) {
+
+         ofstream file;
+
+         file.open( filename.c_str(), ios::app);
+
+         if (!file.good())
+            {
+
+                cout << "Error creating c++.out.txt";
+
+
+         }
+
+    else{
+
+         file << "Student name " << s->getName() << endl
+
+                  << "Student fak nomer: " << s->getFakNo() <<  endl
+
+                  << "Student course " << s->getCourse() << endl
+                   << "Student group " << s->getGroup() << endl;
+
+         for( vector<int>::iterator it = s->getGradess().getGrades().begin(); it < s->getGradess().getGrades().end(); ++it)
+
+                         file << (*it) << endl;
+
+
+
+         file.close();
+
+}
+}
+
+
+ostream & operator<<(ostream& os, Student& student)
+{
+    os<<"Student name: "<<student.getName()<<endl;
+    os<<"Faculty number: "<<student.getFakNo()<<endl;
+    os<<"Group: "<<student.getGroup()<<endl;
+    os<<"Course: "<<student.getCourse()<<endl;
+
+    return os;
+}
+
+
+
+
+int main()
+{
+    vector<Student*> students;
+    vector<int>grades;
+
+    grades.push_back(3);
+    grades.push_back(3);
+    grades.push_back(4);
+    grades.push_back(4);
+    grades.push_back(3);
+
+    Student *student=new Student("Marinela", 5050,52, 3, grades);
+
+
+    vector<int>gradess;
+
+    gradess.push_back(2);
+    gradess.push_back(4);
+    gradess.push_back(4);
+    gradess.push_back(5);
+    gradess.push_back(5);
+
+    Student *student2=new Student("Nina", 6060,52, 2,  gradess);
+
+
+     vector<int>gradesss;
+     gradesss.push_back(2);
+    gradesss.push_back(4);
+    gradesss.push_back(4);
+    gradesss.push_back(6);
+    Student *student3=new Student("Kiril", 2020, 53,  3, gradesss);
+
+    students.push_back(student);
+    students.push_back(student2);
+    students.push_back(student3);
+int faknomer=5050;
+
+    char choice;
+	while(1)
+	{
+		cout<<("^MENU^___________________\n");
+	cout<<(" ||1| : Print student data		 \n ");
+	cout<<("||2| : Print student data by faculty number 5050 \n ");
+	cout<<("||3| : Students average grade	\n ");
+	cout<<("||4| : Group max grades			 \n ");
+	cout<<("||5| : Write to file			 	\n");
+	cout<<("_____________________________\n");
+	cin>>choice;
+		switch(choice){
+			case '1':{printData(student); printData(student2); printData(student3);}
+			break;
+			case '2': {printDataStudent(students, faknomer);}
+			break;
+			case '3':{studentAverageGrades(students);}
+			break;
+			case '4':  {groupMaxGrades(students);}
+			break;
+			case '5': {write_to_file(student,  "student.txt"); write_to_file(student2,  "student2.txt"); write_to_file(student3,  "student3.txt");}
+			break;
+			default : break;
+		}
+	}
+
+
+    return 0;
+}
